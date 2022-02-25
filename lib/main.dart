@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -36,9 +37,10 @@ class _LockBreakerViewState extends State<LockBreakerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.red,
+        backgroundColor: Color.fromRGBO(209, 209, 209, 1),
         appBar: AppBar(
           title: Text("Lock Breaker"),
+          backgroundColor: Color.fromRGBO(76, 76, 76, 1),
         ),
         body: Center(
           child: Column(
@@ -49,7 +51,7 @@ class _LockBreakerViewState extends State<LockBreakerView> {
                       ? CupertinoIcons.lock_open_fill
                       : CupertinoIcons.lock_fill,
                   size: 128,
-                  color: Colors.redAccent),
+                  color: Color.fromRGBO(133, 199, 242, 1)),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 32),
                 height: 120,
@@ -60,14 +62,18 @@ class _LockBreakerViewState extends State<LockBreakerView> {
                       LockDial(
                           startingValue: values[i],
                           onIncrement: () {
-                            setState(() {
-                              values[i]++;
-                            });
+                            values[i]++;
+                            if (values[i] == 10) {
+                              values[i] = 0;
+                            }
+                            setState(() {});
                           },
                           onDecrement: () {
-                            setState(() {
-                              values[i]--;
-                            });
+                            if (values[i] == 0) {
+                              values[i] = 10;
+                            }
+                            values[i]--;
+                            setState(() {});
                           }),
                   ],
                 ),
@@ -79,8 +85,11 @@ class _LockBreakerViewState extends State<LockBreakerView> {
                   onPressed: unlockSafe,
                   child: Container(
                     padding: const EdgeInsets.all(32),
-                    color: Colors.greenAccent,
-                    child: const Text("Open the safe"),
+                    color: Color.fromRGBO(219, 219, 219, 1),
+                    child: const Text("Open the lock",
+                        style: TextStyle(
+                          color: Colors.black,
+                        )),
                   ),
                 ),
               ),

@@ -18,7 +18,7 @@ class LockDial extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(4),
       padding: const EdgeInsets.all(4),
-      color: Colors.orangeAccent,
+      color: Color.fromRGBO(99, 99, 99, 1),
       constraints: const BoxConstraints(minHeight: 60),
       child: Column(
         children: [
