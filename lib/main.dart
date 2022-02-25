@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'lock_breaker_widgets/lock_dial.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,55 +15,104 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: LockBreakerView(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+class LockBreakerView extends StatefulWidget {
+  LockBreakerView({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _LockBreakerViewState createState() => _LockBreakerViewState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  List<int> values = [1, 2, 3, 4, 5];
+class _LockBreakerViewState extends State<LockBreakerView> {
+  List<int> values = [1, 2, 3];
+  String combination = "246";
+  String feedback = '';
+  bool isUnlocked = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.red,
         appBar: AppBar(
           title: Text("Lock Breaker"),
         ),
-        body: Column(
-          children: [
-            for (int i = 0; i < values.length; i++)
-              IncrementalNumberHolderStl(
-                  startingValue: values[i],
-                  onIncrement: () {
-                    setState(() {
-                      values[i]++;
-                    });
-                  },
-                  onDecrement: () {
-                    setState(() {
-                      values[i]--;
-                    });
-                  }),
-            const Text("This is the total of all the values"),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  values = [0, 0, 0, 0, 0];
-                });
-              },
-              child: NumberHolder(
-                content: sumofAllValues(values),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                  isUnlocked
+                      ? CupertinoIcons.lock_open_fill
+                      : CupertinoIcons.lock_fill,
+                  size: 128,
+                  color: Colors.redAccent),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 32),
+                height: 120,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (int i = 0; i < values.length; i++)
+                      LockDial(
+                          startingValue: values[i],
+                          onIncrement: () {
+                            setState(() {
+                              values[i]++;
+                            });
+                          },
+                          onDecrement: () {
+                            setState(() {
+                              values[i]--;
+                            });
+                          }),
+                  ],
+                ),
               ),
-            ),
-          ],
+              if (feedback.isNotEmpty) Text(feedback),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 48),
+                child: TextButton(
+                  onPressed: unlockSafe,
+                  child: Container(
+                    padding: const EdgeInsets.all(32),
+                    color: Colors.greenAccent,
+                    child: const Text("Open the safe"),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ));
+  }
+
+  unlockSafe() {
+    if (checkCombination()) {
+      setState(() {
+        isUnlocked = true;
+        feedback = "You have cracked the lock!";
+      });
+    } else {
+      setState(() {
+        isUnlocked = false;
+        feedback = "Wrong combination, try again!";
+      });
+    }
+  }
+
+  bool checkCombination() {
+    String theCurrentValue = convertValuestoComparableString(values);
+    bool isUnlocked = (theCurrentValue == combination);
+    return isUnlocked;
+  }
+
+  String convertValuestoComparableString(List<int> val) {
+    String temp = "";
+    for (int v in val) temp += "$v";
+    return temp;
   }
 
   int sumofAllValues(List<int> list) {
@@ -88,49 +140,6 @@ class NumberHolder extends StatelessWidget {
           "$content",
           textAlign: TextAlign.center,
         ),
-      ),
-    );
-  }
-}
-
-class IncrementalNumberHolderStl extends StatelessWidget {
-  final int startingValue;
-  final Function()? onIncrement;
-  final Function()? onDecrement;
-  const IncrementalNumberHolderStl(
-      {Key? key,
-      required this.startingValue,
-      this.onIncrement,
-      this.onDecrement})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(4),
-      width: double.infinity,
-      color: Colors.orangeAccent,
-      constraints: const BoxConstraints(minHeight: 60),
-      child: Row(
-        children: [
-          IconButton(
-              onPressed: onDecrement,
-              icon: const Icon(
-                Icons.chevron_left,
-              )),
-          Expanded(
-            child: Text(
-              "$startingValue",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          IconButton(
-              onPressed: onIncrement,
-              icon: const Icon(
-                Icons.chevron_right,
-              )),
-        ],
       ),
     );
   }
